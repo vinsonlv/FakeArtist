@@ -31,7 +31,7 @@
 		<div class="btn-group " data-toggle="buttons">
 			<label class="btn btn-default"
 			       ng-repeat="color in colors"
-			       ng-class="{active: {{color}}=={{currentColor}}}"
+			       ng-class="{active: color===currentColor}"
 			       ng-click="setGhostNum(color)"
 				style="color:{{color}}">
 				<input type="radio" ng-model="newGame.ghostNum" value="{{color}}">
