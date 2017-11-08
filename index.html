@@ -229,7 +229,8 @@
 
 			$scope.back2NumSet = function() {
 				$('#setInfoModal').modal('hide');
-				$('#createGameModal').modal('show');
+				$('#create
+				  Modal').modal('show');
 			}
 
 			$scope.gameNumSet = function() {
@@ -272,28 +273,7 @@
 				localStorage.foolNum = 2;
 			}
 
-			$scope.joinGame = function(i) {
-				$('#joinGameModal').modal({
-					backdrop : 'static'
-				});
-				var url = "/api/game/" + i;
-				$http({
-					method : 'PUT',
-					data : {
-						nick : $scope.nick,
-						action : 'join'
-					},
-					url : url
-				}).success(function(response, status, headers, config) {
-					console.log(response);
-					window.location.href = '/game.html#' + response.user.game;
-					//do anything what you want;
-				}).error(function(response, status, headers, config) {
-					//do  anything what you want;
-				});
-			}
-
-			$scope.setHumanNum = function(i) {
+				$scope.setHumanNum = function(i) {
 				$scope.newGame.humanNum = i;
 				localStorage.humanNum = i;
 
@@ -309,37 +289,6 @@
 			$scope.newGame.foolInfo = [ "", "", "", "", "" ];
 			$scope.newGame.humanInfo = "";
 			$scope.newGame.ghostInfo = "";
-
-			$scope.createGame = function() {
-				$scope.newGame.hostNick = $scope.nick;
-				$http({
-					method : 'POST',
-					data : $scope.newGame,
-					url : "/api/game/"
-				}).success(function(response, status, headers, config) {
-					window.location.href = '/game.html#' + response.user.game;
-					//do anything what you want;
-				}).error(function(response, status, headers, config) {
-					//do  anything what you want;
-				});
-			};
-
-			$http.get("/api/game/").success(function(response) {
-				$scope.gameList = response.gameList;
-				if (response.user.game != 0) {
-					window.location.href = '/game.html#' + response.user.game;
-				}
-			});
-			$interval(function() {
-				$http.get("/api/game/").success(
-						function(response) {
-							$scope.gameList = response.gameList;
-							if (response.user.game != 0) {
-								window.location.href = '/game.html#'
-										+ response.user.game;
-							}
-						});
-			}, 10000);
 		});
 
 		app.filter('range', function() {
