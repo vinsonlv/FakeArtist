@@ -16,47 +16,15 @@
 </head>
 <body ng-app="myApp" ng-controller="gamesCtrl">
 	<div class="container">
-		<h3>伪艺术家纽约行</h3>
-		<h4>
-			昵称: {{nick}}
+		<h3 id="header">
+			伪艺术家纽约行
 			<button class="btn btn-primary btn-xs" style="float: right"
-				data-toggle="modal" data-target="#editNickModal">
-				<span class="glyphicon glyphicon-pencil"></span>更改昵称
+				data-toggle="modal" data-target="#createGameModal">
+				<span class="glyphicon glyphicon-repeat"></span>开始新游戏
 			</button>
-		</h4>
-		<!-- Modal -->
-		<div class="modal fade" id="editNickModal" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true"
-			data-backdrop="static">
-			<div class="alert alert-danger" id="nickEmptyAlert" role="alert"
-				hidden>
-				<strong>昵称更改失败</strong>昵称禁止为空
-			</div>
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-						<h4 class="modal-title" id="myModalLabel">输入昵称</h4>
-					</div>
-					<div class="modal-body">
-						<label for="newNick">新昵称：</label> <input type="text"
-							ng-model="newNick">
-						<div class="alert alert-danger well-sm" ng-show="newNick==''">昵称不能为空！</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default btn-xs"
-							data-dismiss="modal">取消</button>
-						<button type="button" class="btn btn-primary btn-xs"
-							ng-click="changeNick()" ng-disabled="newNick==''">确定</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
+		</h3>
 		<hr>
+		
 		<h4>游戏列表</h4>
 		<table class="table table-striped">
 			<thead>
@@ -211,11 +179,6 @@
 		var app = angular.module('myApp', []);
 		app.controller('gamesCtrl', function($scope, $http, $interval) {
 			$scope.newGame = new Object();
-			$('#editNickModal').on('hidden.bs.modal', function(e) {
-				if ($scope.nick == '') {
-					$('#editNickModal').modal('show');
-				}
-			});
 
 			$scope.changeNick = function() {
 				if ($scope.newNick == '') {
@@ -238,15 +201,12 @@
 			$scope.newGame.foolInfo[2] = '';
 			$scope.newGame.foolInfo[3] = '';
 			$scope.newGame.foolInfo[4] = '';
-			if (localStorage.nick) {
-				$scope.nick = localStorage.nick;
-				$scope.newNick = localStorage.nick;
+			if (localStorage.game) {
+				$scope.game = localStorage.game;
 			} else {
-				$scope.nick = '';
-				$scope.newNick = '';
 			}
-			if ($scope.nick == '') {
-				$('#editNickModal').modal('show');
+			if ($scope.game) {
+				$('#createGameModal').modal('show');
 			}
 			if (localStorage.humanNum) {
 				$scope.newGame.humanNum = localStorage.humanNum;
