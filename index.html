@@ -20,7 +20,7 @@
 			伪艺术家纽约行
 			<button class="btn btn-primary btn-xs" style="float: right"
 				data-toggle="modal" data-target="#ruleModal">
-				<span class="glyphicon glyphicon-question-sign"></span>显示规则
+				<span class="glyphicon glyphicon-question-sign"></span>游戏规则
 			</button>
 			<button class="btn btn-primary btn-xs" style="float: right"
 				data-toggle="modal" data-target="#createGameModal">
@@ -28,37 +28,10 @@
 			</button>
 		</h3>
 		<hr>
-		
-		<h4>游戏列表</h4>
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th>加入游戏</th>
-					<th>上帝</th>
-					<th>人数</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="game in gameList">
-					<td>
-						<button class="btn btn-success btn-xs"
-							ng-click="joinGame(game.id)">
-							<span class="glyphicon glyphicon-log-in"></span>  加入
-						</button>
-					</td>
-					<td>{{ game.hostNick }}</td>
-					<td><span class="badge">{{ game.waitingCount }}/{{
-							(game.humanNum/1 + game.ghostNum/1 + game.foolNum/1)/1 }}</span></td>
-				</tr>
-			</tbody>
-		</table>
+
 		<hr>
-		<h4>
-			<button class="btn btn-primary btn-xs" data-toggle="modal"
-				data-target="#createGameModal">
-				<span class="glyphicon glyphicon-plus"></span>创建游戏
-			</button>
-		</h4>
+		<svg id="sketch" style="cursor:default">
+		</svg>
 		<!-- Modal -->
 		<div class="modal fade" id="createGameModal" tabindex="-1"
 			role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
@@ -163,17 +136,28 @@
 			</div>
 		</div>
 		<!-- Modal -->
-		<div class="modal fade" id="joinGameModal" tabindex="-1" role="dialog"
+		<div class="modal fade" id="ruleModal" tabindex="-1" role="dialog"
 			aria-labelledby="myModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h4 class="modal-title" id="myModalLabel">加入游戏</h4>
+						<h4 class="modal-title" id="myModalLabel">游戏规则</h4>
 					</div>
 					<div class="modal-body">
-						<div>加入中...</div>
+						<div>
+							<ol>
+								<li>开始新游戏后，艺术家依次选定颜色并获得类别及提示词，然后把平板递给下一个玩家。伪艺术家只能看到类别。真艺术家获得的提示词一致。</li>
+								<li>所有艺术家选定颜色并获得提示词后，依颜色顺序开始作画，每次仅能画一笔，然后递给下个玩家。</li>
+								<li>每个艺术家各绘制2笔后，绘画结束。</li>
+								<li>所有艺术家投票选出伪艺术家。</li>
+								<li>若伪艺术家未被认出（未被最多人指认），则可与出题人共同获得2分。但若伪艺术家被认出，则该伪艺术家有一次猜题机会。若能猜对所绘内容，则可与出题者共同获得2分。否则，其他艺术家可各获得一分。</li>
+							</ol>
+						</div>
 					</div>
-					<div class="modal-footer"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-xs"
+							data-dismiss="modal">我知道了</button>
+					</div>
 				</div>
 			</div>
 		</div>
