@@ -28,7 +28,15 @@
 			</button>
 		</h3>
 		<hr>
-
+		<div class="btn-group " data-toggle="buttons">
+			<label class="btn btn-default btn-sm"
+			       ng-repeat="i in [] | range:5"
+			       ng-class="{active: {{i+1}}==newGame.ghostNum}"
+			       ng-click="setGhostNum(i+1)">
+				<input type="radio" ng-model="newGame.ghostNum" value="{{i+1}}">
+				<span class="glyphicon glyphicons-tint"></span>
+			</label>
+		</div>
 		<hr>
 		<svg id="sketch" style="cursor:default">
 		</svg>
@@ -233,7 +241,7 @@
 			$scope.newGame.ghostInfo = "";
 			
 			$http.get("/FakeArtist/list.json").success(function(response) {
-				$scope.randomeList = response.randomeList;
+				$scope.randomList = response.randomList;
 				console.log($scope.randomeList);
 			});
 		});
