@@ -1,1 +1,356 @@
-Hello
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>伪艺术家纽约行</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="/css/bootstrap.min.css">
+<script
+	src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+<script
+	src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="gamesCtrl">
+	<div class="container">
+		<h3>伪艺术家纽约行</h3>
+		<h4>
+			昵称: {{nick}}
+			<button class="btn btn-primary btn-xs" style="float: right"
+				data-toggle="modal" data-target="#editNickModal">
+				<span class="glyphicon glyphicon-pencil"></span>更改昵称
+			</button>
+		</h4>
+		<!-- Modal -->
+		<div class="modal fade" id="editNickModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true"
+			data-backdrop="static">
+			<div class="alert alert-danger" id="nickEmptyAlert" role="alert"
+				hidden>
+				<strong>昵称更改失败</strong>昵称禁止为空
+			</div>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">输入昵称</h4>
+					</div>
+					<div class="modal-body">
+						<label for="newNick">新昵称：</label> <input type="text"
+							ng-model="newNick">
+						<div class="alert alert-danger well-sm" ng-show="newNick==''">昵称不能为空！</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-xs"
+							data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary btn-xs"
+							ng-click="changeNick()" ng-disabled="newNick==''">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<hr>
+		<h4>游戏列表</h4>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>加入游戏</th>
+					<th>上帝</th>
+					<th>人数</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="game in gameList">
+					<td>
+						<button class="btn btn-success btn-xs"
+							ng-click="joinGame(game.id)">
+							<span class="glyphicon glyphicon-log-in"></span>  加入
+						</button>
+					</td>
+					<td>{{ game.hostNick }}</td>
+					<td><span class="badge">{{ game.waitingCount }}/{{
+							(game.humanNum/1 + game.ghostNum/1 + game.foolNum/1)/1 }}</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<hr>
+		<h4>
+			<button class="btn btn-primary btn-xs" data-toggle="modal"
+				data-target="#createGameModal">
+				<span class="glyphicon glyphicon-plus"></span>创建游戏
+			</button>
+		</h4>
+		<!-- Modal -->
+		<div class="modal fade" id="createGameModal" tabindex="-1"
+			role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+			data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">创建游戏</h4>
+					</div>
+					<div class="modal-body">
+						<p>
+							<label for="ghostNum" class="col-md-2 control-label">鬼数量</label>
+						</p>
+						<p>
+						<div class="btn-group " data-toggle="buttons">
+							<label class="btn btn-default btn-sm"
+								ng-repeat="i in [] | range:5"
+								ng-class="{active: {{i+1}}==newGame.ghostNum}"
+								ng-click="setGhostNum(i+1)"> <input type="radio"
+								ng-model="newGame.ghostNum" value="{{i+1}}"> {{i+1}}
+							</label>
+						</div>
+						</p>
+						<p>
+							<label for="humanNum" class="col-md-2 control-label">人类数量</label>
+						</p>
+						<p>
+						<div class="btn-group " data-toggle="buttons">
+							<label class="btn btn-default btn-sm"
+								ng-repeat="i in [] | range:10"
+								ng-class="{active: {{i+1}}==newGame.humanNum}"
+								ng-click="setHumanNum(i+1)"> <input type="radio"
+								ng-model="newGame.humanNum" id="{{i+1}}" value="{{i+1}}">
+								{{i+1}}
+							</label>
+						</div>
+						</p>
+						<p>
+							<label for="foolNum" class="col-md-2 control-label">傻瓜数量</label>
+						</p>
+						<p>
+						<div class="btn-group " data-toggle="buttons">
+							<label class="btn btn-default btn-sm"
+								ng-class="{active: {{i+1}}==newGame.foolNum}"
+								ng-repeat="i in [] | range:5" ng-click="setFoolNum(i+1)">
+								<input type="radio" name="foolNum" ng-model="newGame.foolNum"
+								id="{{i+1}}" value="{{i+1}}"> {{i+1}}
+							</label>
+						</div>
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-xs"
+							data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary btn-xs"
+							ng-click="gameNumSet()">下一步</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal -->
+		<div class="modal fade" id="setInfoModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true"
+			data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">输入信息</h4>
+					</div>
+					<div class="modal-body">
+						<p>
+							<label>鬼的信息：</label> <input type="text"
+								ng-model="newGame.ghostInfo">
+						</p>
+						<p>
+							<label>人的信息：</label> <input type="text"
+								ng-model="newGame.humanInfo">
+						</p>
+						<p>
+							<label>傻瓜的信息：</label>
+						</p>
+						<p ng-repeat="i in [] | range:newGame.foolNum">
+							<label>傻瓜{{i+1}}</label> <input type="text"
+								ng-model="newGame.foolInfo[i]">
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-xs"
+							ng-click="back2NumSet()">上一步</button>
+						<button type="button" class="btn btn-primary btn-xs"
+							ng-click="createGame()">创建游戏</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal -->
+		<div class="modal fade" id="joinGameModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title" id="myModalLabel">加入游戏</h4>
+					</div>
+					<div class="modal-body">
+						<div>加入中...</div>
+					</div>
+					<div class="modal-footer"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var app = angular.module('myApp', []);
+		app.controller('gamesCtrl', function($scope, $http, $interval) {
+			$scope.newGame = new Object();
+			$('#editNickModal').on('hidden.bs.modal', function(e) {
+				if ($scope.nick == '') {
+					$('#editNickModal').modal('show');
+				}
+			});
+
+			$scope.changeNick = function() {
+				if ($scope.newNick == '') {
+					$('#nickEmptyAlert').show();
+				} else {
+					$scope.nick = $scope.newNick;
+					localStorage.nick = $scope.nick;
+					$('#editNickModal').modal('hide');
+				}
+			}
+
+			$scope.back2NumSet = function() {
+				$('#setInfoModal').modal('hide');
+				$('#createGameModal').modal('show');
+			}
+
+			$scope.gameNumSet = function() {
+				$('#createGameModal').modal('hide');
+				$('#setInfoModal').modal('show');
+			}
+
+			$scope.newGame.foolInfo = new Array();
+			$scope.newGame.foolInfo[0] = '';
+			$scope.newGame.foolInfo[1] = '';
+			$scope.newGame.foolInfo[2] = '';
+			$scope.newGame.foolInfo[3] = '';
+			$scope.newGame.foolInfo[4] = '';
+			if (localStorage.nick) {
+				$scope.nick = localStorage.nick;
+				$scope.newNick = localStorage.nick;
+			} else {
+				$scope.nick = '';
+				$scope.newNick = '';
+			}
+			if ($scope.nick == '') {
+				$('#editNickModal').modal('show');
+			}
+			if (localStorage.humanNum) {
+				$scope.newGame.humanNum = localStorage.humanNum;
+			} else {
+				$scope.newGame.humanNum = 3;
+				localStorage.humanNum = 3;
+			}
+			if (localStorage.ghostNum) {
+				$scope.newGame.ghostNum = localStorage.ghostNum;
+			} else {
+				$scope.newGame.ghostNum = 3;
+				localStorage.ghostNum = 3;
+			}
+			if (localStorage.foolNum) {
+				$scope.newGame.foolNum = localStorage.foolNum;
+			} else {
+				$scope.newGame.foolNum = 2;
+				localStorage.foolNum = 2;
+			}
+
+			$scope.joinGame = function(i) {
+				$('#joinGameModal').modal({
+					backdrop : 'static'
+				});
+				var url = "/api/game/" + i;
+				$http({
+					method : 'PUT',
+					data : {
+						nick : $scope.nick,
+						action : 'join'
+					},
+					url : url
+				}).success(function(response, status, headers, config) {
+					console.log(response);
+					window.location.href = '/game.html#' + response.user.game;
+					//do anything what you want;
+				}).error(function(response, status, headers, config) {
+					//do  anything what you want;
+				});
+			}
+
+			$scope.setHumanNum = function(i) {
+				$scope.newGame.humanNum = i;
+				localStorage.humanNum = i;
+
+			}
+			$scope.setGhostNum = function(i) {
+				$scope.newGame.ghostNum = i;
+				localStorage.ghostNum = i;
+			}
+			$scope.setFoolNum = function(i) {
+				$scope.newGame.foolNum = i;
+				localStorage.foolNum = i;
+			}
+			$scope.newGame.foolInfo = [ "", "", "", "", "" ];
+			$scope.newGame.humanInfo = "";
+			$scope.newGame.ghostInfo = "";
+
+			$scope.createGame = function() {
+				$scope.newGame.hostNick = $scope.nick;
+				$http({
+					method : 'POST',
+					data : $scope.newGame,
+					url : "/api/game/"
+				}).success(function(response, status, headers, config) {
+					window.location.href = '/game.html#' + response.user.game;
+					//do anything what you want;
+				}).error(function(response, status, headers, config) {
+					//do  anything what you want;
+				});
+			};
+
+			$http.get("/api/game/").success(function(response) {
+				$scope.gameList = response.gameList;
+				if (response.user.game != 0) {
+					window.location.href = '/game.html#' + response.user.game;
+				}
+			});
+			$interval(function() {
+				$http.get("/api/game/").success(
+						function(response) {
+							$scope.gameList = response.gameList;
+							if (response.user.game != 0) {
+								window.location.href = '/game.html#'
+										+ response.user.game;
+							}
+						});
+			}, 10000);
+		});
+
+		app.filter('range', function() {
+			return function(input, total) {
+				total = parseInt(total);
+				for ( var i = 0; i < total; i++)
+					input.push(i);
+				return input;
+			};
+		});
+	</script>
+</body>
+</html>
+
