@@ -30,9 +30,10 @@
 		<hr>
 		<div class="btn-group " data-toggle="buttons">
 			<label class="btn btn-default"
-			       ng-repeat="i in [] | range:5"
+			       ng-repeat="i in [] | range:16"
 			       ng-class="{active: {{i+1}}==newGame.ghostNum}"
-			       ng-click="setGhostNum(i+1)">
+			       ng-click="setGhostNum(i+1)"
+				style="color:{color[i]}">
 				<input type="radio" ng-model="newGame.ghostNum" value="{{i+1}}">
 				&#x270f;
 			</label>
@@ -175,6 +176,7 @@
 		var app = angular.module('myApp', []);
 		app.controller('gamesCtrl', function($scope, $http, $interval) {
 			$scope.newGame = new Object();
+			$scope.color= ['white','sliver','gray','black','red','maroon','yellow','olive','lime','green','aqua','teal','blue','navy','fuchsia','purple']						    
 
 			$scope.changeNick = function() {
 				if ($scope.newNick == '') {
