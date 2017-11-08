@@ -231,6 +231,11 @@
 			$scope.newGame.foolInfo = [ "", "", "", "", "" ];
 			$scope.newGame.humanInfo = "";
 			$scope.newGame.ghostInfo = "";
+			
+			$http.get("/FakeArtist/list.json").success(function(response) {
+				$scope.randomeList = response.randomeList;
+				console.log($scope.randomeList);
+			});
 		});
 
 		app.filter('range', function() {
