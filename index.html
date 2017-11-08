@@ -34,11 +34,11 @@
 			       ng-class="{active: {{i+1}}==newGame.ghostNum}"
 			       ng-click="setGhostNum(i+1)">
 				<input type="radio" ng-model="newGame.ghostNum" value="{{i+1}}">
-				<span class="glyphicon glyphicons-tint"></span>
+				&#x270f;
 			</label>
 		</div>
 		<hr>
-		<svg id="sketch" style="cursor:default">
+		<svg id="sketch" style="cursor:default;height: -webkit-fill-available;width: -webkit-fill-available;border: 1px solid;">
 		</svg>
 		<!-- Modal -->
 		<div class="modal fade" id="createGameModal" tabindex="-1"
