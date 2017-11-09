@@ -1,0 +1,14 @@
+html,
+body {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+#sketch {
+  flex: 1 1 auto;
+}
