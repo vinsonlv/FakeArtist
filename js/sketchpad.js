@@ -2,7 +2,7 @@
 var app = angular.module('myApp', ["ngTouch"]);
 app.controller('gamesCtrl', function ($scope, $http, $interval) {
 
-  $scope.colors = ['gray', 'black', 'red', 'maroon', 'yellow', 'olive', 'lime', 'green', 'aqua', 'teal', 'blue', 'navy', 'fuchsia', 'purple'];
+  $scope.colors = ['red', 'yellow', 'lime', 'aqua', 'blue', 'fuchsia', 'gray', 'maroon', 'olive', 'green', 'teal', 'navy', 'purple', 'black'];
   $scope.newGame = new Object();
   $scope.newGame.humanNum = 3;
   $scope.newGame.ghostNum = 1;
@@ -19,6 +19,7 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
   }
 
   $scope.isDrawing = 0;
+  $scope.undoCounter = 0;
 
   $scope.setHumanNum = function (i) {
     $scope.newGame.humanNum = i;
@@ -88,7 +89,7 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
       $scope.newGame.humanNum = 3;
       $scope.newGame.ghostNum = 1;
       $('#pickColorModal').modal('hide');
-      
+
       $scope.currentGame.stage = 1;
       $scope.currentGame.paths = [];
       $scope.currentGame.toDrawColors = $scope.newGame.pickedColors.slice();
@@ -115,6 +116,7 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
     $scope.currentGame.paths.push(path);
 
     $scope.isDrawing = 1;
+    $scope.undoCounter = 0;
   }
 
   $scope.drawMove = function (e) {
@@ -138,43 +140,49 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
       e = e.touches[0];
     }
     $scope.isDrawing = 0;
-    if ($scope.currentGame.stage > 0 && $scope.currentGame.stage<3) {
+    if ($scope.currentGame.stage > 0 && $scope.currentGame.stage < 3) {
       $scope.currentGame.usedColors.push($scope.currentGame.currentColor);
       var index = $scope.currentGame.toDrawColors.indexOf($scope.currentGame.currentColor);
       $scope.currentGame.toDrawColors.splice(index, 1);
-      if ($scope.currentGame.toDrawColors.length>0) {
-      $scope.currentGame.currentColor = $scope.currentGame.toDrawColors[0];
+      if ($scope.currentGame.toDrawColors.length > 0) {
+        $scope.currentGame.currentColor = $scope.currentGame.toDrawColors[0];
       }
       if ($scope.currentGame.toDrawColors.length == 0) {
         $scope.currentGame.stage = ($scope.currentGame.stage + 1) % 4;
-        $scope.currentGame.toDrawColors=$scope.currentGame.usedColors.slice();
+        $scope.currentGame.toDrawColors = $scope.currentGame.usedColors.slice();
         $scope.currentGame.currentColor = $scope.currentGame.toDrawColors[0];
-        $scope.currentGame.usedColors=[];
+        $scope.currentGame.usedColors = [];
       }
       if ($scope.currentGame.stage == 3) {
         $('#drawRoundModel').modal('show');
       }
     }
-    localStorage.currentGame=JSON.stringify($scope.currentGame);
+    localStorage.currentGame = JSON.stringify($scope.currentGame);
   }
 
   $scope.undoDraw = function (e) {
-    if ($scope.currentGame.stage == 3 && $scope.currentGame.paths.length<=$scope.currentGame.toDrawColors.length*2) {
+    $scope.undoCounter ++;
+    if ($scope.undoCounter>=10) {
+      localStorage.clear();
+      location.reload();
+      return;
+    }
+    if ($scope.currentGame.stage == 3 && $scope.currentGame.paths.length <= $scope.currentGame.toDrawColors.length * 2) {
       return;
     }
     $scope.currentGame.paths.pop();
-    if ($scope.currentGame.stage > 0 && $scope.currentGame.stage<3) {
-      if ($scope.currentGame.usedColors.length>0) {
+    if ($scope.currentGame.stage > 0 && $scope.currentGame.stage < 3) {
+      if ($scope.currentGame.usedColors.length > 0) {
         $scope.currentGame.toDrawColors.unshift($scope.currentGame.usedColors.pop());
-      } else if ($scope.currentGame.stage > 1){
-        var tmp=$scope.currentGame.toDrawColors.pop();
-        $scope.currentGame.usedColors=$scope.currentGame.toDrawColors.slice();
-        $scope.currentGame.toDrawColors=[tmp];
+      } else if ($scope.currentGame.stage > 1) {
+        var tmp = $scope.currentGame.toDrawColors.pop();
+        $scope.currentGame.usedColors = $scope.currentGame.toDrawColors.slice();
+        $scope.currentGame.toDrawColors = [tmp];
         $scope.currentGame.stage--;
       }
       $scope.currentGame.currentColor = $scope.currentGame.toDrawColors[0];
     }
-    localStorage.currentGame=JSON.stringify($scope.currentGame);
+    localStorage.currentGame = JSON.stringify($scope.currentGame);
   }
 
   $http.get("/FakeArtist/wordList.json").success(function (response) {

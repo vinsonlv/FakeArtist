@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, user-scalable = no" />
 
-<title>伪艺术家纽约行</title>
+<title>灵魂艺术家</title>
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet"
 	href="/FakeArtist/css/bootstrap.min.css">
@@ -19,17 +19,17 @@
 <body ng-app="myApp" ng-controller="gamesCtrl">
 	<div class="container">
 		<h3 id="header">
-			伪艺术家纽约行：
+			灵魂艺术家：
       <span ng-show="currentGame.stage==1">第一轮</span>
       <span ng-show="currentGame.stage==2">第二轮</span>
       <span ng-show="currentGame.stage==3">投票</span>
-			<button class="btn btn-primary" style="float: right"
+			<button class="btn btn-primary btn-sm" style="float: right"
 				data-toggle="modal" data-target="#ruleModal">
-				<span class="glyphicon glyphicon-question-sign"></span>游戏规则
+				<span class="glyphicon glyphicon-question-sign"></span>规则
 			</button>
-			<button class="btn btn-primary" style="float: right"
+			<button class="btn btn-primary btn-sm" style="float: right"
 				data-toggle="modal" data-target="#createGameModal">
-				<span class="glyphicon glyphicon-repeat"></span>开始新游戏
+				<span class="glyphicon glyphicon-repeat"></span>新游戏
 			</button>
 		</h3>
 		<hr>
