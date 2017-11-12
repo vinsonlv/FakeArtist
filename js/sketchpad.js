@@ -100,6 +100,7 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
 
   $scope.setCurrentColor = function (color) {
     $scope.currentGame.currentColor = color;
+    
   }
 
   $scope.drawStart = function (e) {
@@ -157,7 +158,7 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
         $('#drawRoundModel').modal('show');
       }
     }
-    localStorage.currentGame = JSON.stringify($scope.currentGame);
+    localStorage.currentGame = angular.toJson($scope.currentGame);
   }
 
   $scope.undoDraw = function (e) {
@@ -182,7 +183,7 @@ app.controller('gamesCtrl', function ($scope, $http, $interval) {
       }
       $scope.currentGame.currentColor = $scope.currentGame.toDrawColors[0];
     }
-    localStorage.currentGame = JSON.stringify($scope.currentGame);
+    localStorage.currentGame = angular.toJson($scope.currentGame);
   }
 
   $http.get("/FakeArtist/wordList.json").success(function (response) {
