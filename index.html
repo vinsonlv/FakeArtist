@@ -16,6 +16,7 @@
 <script
 	src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
+<script type="text/javascript" src="/FakeArtist/js/ngTouch.min.js"></script>
 <body ng-app="myApp" ng-controller="gamesCtrl">
 	<div class="container">
 		<h3 id="header">
@@ -41,8 +42,11 @@
 			</label>
 		</div>
 		<hr>
-		<svg id="sketch">
+    <div id="sketchpaddiv" ng-touchstart="drawStart($event)" ng-touchmove="drawMove($event)" >
+		<svg id="sketchpad">
+      <path ng-repeat="path in paths" d="{{path.d}}" fill="none" stroke="{{path.c}}" stroke-width="2"></path>
 		</svg>
+    </div>
     <hr>
 		<!-- Modal -->
 		<div class="modal fade" id="createGameModal" tabindex="-1"
@@ -182,9 +186,16 @@
       if (localStorage.currentColor) {
         $scope.currentColor=localStorage.currentColor;
       } else {
-        localStorage.currentColor='red';
         $scope.currentColor=localStorage.currentColor;
       }
+      
+      if (localStorage.paths) {
+        $scope.paths=localStorage.paths;
+      } else {
+        $scope.paths=[];
+      }
+      
+      $scope.isDrawing = 0;
       
 			$scope.colors= ['gray','black','red','maroon','yellow','olive','lime','green','aqua','teal','blue','navy','fuchsia','purple']						    
 
@@ -258,6 +269,40 @@
 			$scope.newGame.humanInfo = "";
 			$scope.newGame.ghostInfo = "";
 			
+      $scope.drawStart = function(e) {
+        console.log(e);
+        e.preventDefault();
+        if (e.touches) {
+            e = e.touches[0];
+        }
+        var path=new Object();
+        path.d='M' + e.offsetX + ' ' + e.offsetY;
+        path.c=$scope.currentColor;
+        
+        $scope.paths.push(path);
+        
+        $scope.isDrawing = 1;
+        
+        console.log('mouse down'+ e.offsetX + ' ' + e.offsetY);
+      }
+      
+      $scope.drawMove = function(e) {
+        if ($scope.isDrawing!=1) {
+          return;
+        }
+        e.preventDefault();
+        if (e.touches) {
+            e = e.touches[0];
+        }
+        var path=new Object();
+        path.d='M' + e.offsetX + ' ' + e.offsetY;
+        path.c=$scope.currentColor;
+        
+        $scope.paths[$scope.paths.length-1].d += ' L' + e.offsetX + ' ' + e.offsetY;
+        
+        console.log('mouse move'+ e.offsetX + ' ' + e.offsetY);
+      }
+      
 			$http.get("/FakeArtist/list.json").success(function(response) {
 				$scope.randomList = response.randomList;
 			});
@@ -272,7 +317,7 @@
 			};
 		});
 	</script>
-  <script src="/FakeArtist/js/sketchpad.js"></script>
+  <!-- <script src="/FakeArtist/js/sketchpad.js"></script> -->
 </body>
 </html>
 
