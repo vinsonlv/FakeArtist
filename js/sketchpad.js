@@ -1,86 +1,165 @@
-(function () {
+'use strict';
+var app = angular.module('myApp', ["ngTouch"]);
+app.controller('gamesCtrl', function ($scope, $http, $interval) {
+    $scope.newGame = new Object();
+    $scope.colors = ['gray', 'black', 'red', 'maroon', 'yellow', 'olive', 'lime', 'green', 'aqua', 'teal', 'blue', 'navy', 'fuchsia', 'purple']
+    
+    if (localStorage.currentColor) {
+        $scope.currentColor = localStorage.currentColor;
+    } else {
+        $scope.currentColor = $scope.colors[0];
+    }
 
-    'use strict';
+    if (localStorage.paths) {
+        $scope.paths = localStorage.paths;
+    } else {
+        $scope.paths = [];
+    }
 
-    var svg = document.querySelector('svg'),
-    label = svg.querySelector('text'),
-    path = null,
-    coords = null;
+    $scope.isDrawing = 0;
 
-    function handleDrawMove(e) {
+    
 
+    $scope.changeNick = function () {
+        if ($scope.newNick == '') {
+            $('#nickEmptyAlert').show();
+        } else {
+            $scope.nick = $scope.newNick;
+            localStorage.nick = $scope.nick;
+            $('#editNickModal').modal('hide');
+        }
+    }
+
+    $scope.gameNumSet = function () {
+        $('#createGameModal').modal('hide');
+        $scope.setRandomGame(1);
+        $('#setInfoModal').modal('show');
+    }
+
+    $scope.back2NumSet = function () {
+        $('#setInfoModal').modal('hide');
+        $('#createGameModal').modal('show');
+    }
+
+    $scope.newGame.foolInfo = new Array();
+    $scope.newGame.foolInfo[0] = '';
+    $scope.newGame.foolInfo[1] = '';
+    $scope.newGame.foolInfo[2] = '';
+    $scope.newGame.foolInfo[3] = '';
+    $scope.newGame.foolInfo[4] = '';
+    if (localStorage.game) {
+        $scope.game = localStorage.game;
+    } else {}
+    if ($scope.game) {
+        $('#createGameModal').modal('show');
+    }
+    if (localStorage.humanNum) {
+        $scope.newGame.humanNum = localStorage.humanNum;
+    } else {
+        $scope.newGame.humanNum = 3;
+    }
+    if (localStorage.ghostNum) {
+        $scope.newGame.ghostNum = localStorage.ghostNum;
+    } else {
+        $scope.newGame.ghostNum = 1;
+    }
+
+    $scope.newGame.randomGame = 1;
+
+    $scope.setHumanNum = function (i) {
+        $scope.newGame.humanNum = i;
+        localStorage.humanNum = i;
+    }
+
+    $scope.setGhostNum = function (i) {
+        $scope.newGame.ghostNum = i;
+        localStorage.ghostNum = i;
+    }
+
+    $scope.setRandomGame = function (i) {
+        $scope.newGame.randomGame = i;
+        if (i) {
+          var rand=Math.floor(Math.random() * $scope.wordList.length);
+          $scope.newGame.category=$scope.wordList[rand].category;
+          $scope.newGame.word=$scope.wordList[rand].words[Math.floor(Math.random() *$scope.wordList[rand].words.length)];
+        } else {
+          $scope.newGame.category='';
+          $scope.newGame.word='';
+        }
+    }
+    
+    $scope.createGame = function() {
+      $('#createGameModal').modal('hide');
+      $scope.availableColors=$scope.colors;
+      $scope.pickedColors=$scope.colors;
+      $('#showInfo').modal('show');
+	  };
+    
+    $scope.pickColor = function (color) {
+        $scope.pickedColor = color;
+    }
+
+    $scope.newGame.category = "";
+    $scope.newGame.word = "";
+
+    $scope.setCurrentColor = function (color) {
+        $scope.currentColor = color;
+    }
+
+    $scope.drawStart = function (e) {
+        console.log(e);
         e.preventDefault();
-
         if (e.touches) {
             e = e.touches[0];
         }
+        var rect = document.getElementById('sketchpad').getBoundingClientRect();
+        var path = new Object();
+        path.d = 'M' + (e.pageX - rect.left) + ' ' + (e.pageY - rect.top);
+        path.c = $scope.currentColor;
 
-        var rect = document.getElementById('sketch').getBoundingClientRect();
+        $scope.paths.push(path);
 
-        if (e.pageY < rect.top) {
-            return;
-        }
-
-        coords += 'L' + (e.pageX - rect.left) + ' ' + (e.pageY - rect.top);
-
-        path.setAttribute('d', coords);
-
+        $scope.isDrawing = 1;
     }
 
-    function handleDrawStart(e) {
-        event = e;
+    $scope.drawMove = function (e) {
+        if ($scope.isDrawing != 1) {
+            return;
+        }
+        e.preventDefault();
         if (e.touches) {
             e = e.touches[0];
         }
+        var rect = document.getElementById('sketchpad').getBoundingClientRect();
+        $scope.paths[$scope.paths.length - 1].d += ' L' + (e.pageX - rect.left) + ' ' + (e.pageY - rect.top);
+    }
 
-        var rect = document.getElementById('sketch').getBoundingClientRect();
-
-        if (e.pageY < rect.top) {
+    $scope.drawEnd = function (e) {
+        if ($scope.isDrawing != 1) {
             return;
         }
-        event.preventDefault();
-
-        if (label) {
-            svg.removeChild(label);
-            label = null;
+        e.preventDefault();
+        if (e.touches) {
+            e = e.touches[0];
         }
-
-        path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-
-        svg.appendChild(path);
-
-        var rect = document.getElementById('sketch').getBoundingClientRect();
-        coords = 'M' + (e.pageX - rect.left) + ' ' + (e.pageY - rect.top);
-
-        path.setAttribute('d', coords);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', localStorage.currentColor);
-        path.setAttribute('stroke-width', 2);
-
-        svg.addEventListener('mousemove', handleDrawMove);
-        //svg.addEventListener('touchmove', handleDrawMove);
-        document.addEventListener('touchmove', handleDrawMove);
-
+        $scope.isDrawing = 0;
     }
 
-    function handleDrawEnd() {
-
-        path = null;
-        coords = null;
-
-        svg.removeEventListener('mousemove', handleDrawMove);
-        //svg.removeEventListener('touchmove', handleDrawMove);
-        document.removeEventListener('touchmove', handleDrawMove);
-
+    $scope.undoDraw = function (e) {
+        $scope.paths.pop();
     }
 
-    svg.addEventListener('mousedown', handleDrawStart);
-    //svg.addEventListener('touchstart', handleDrawStart);
-    document.addEventListener('touchstart', handleDrawStart);
+    $http.get("/FakeArtist/wordList.json").success(function (response) {
+        $scope.wordList = response;
+        console.log($scope.wordList);
+    });
+});
 
-    svg.addEventListener('mouseup', handleDrawEnd);
-    //svg.addEventListener('touchend', handleDrawEnd);
-    document.addEventListener('touchend', handleDrawEnd);
-
-}
-    ());
+app.filter('range', function () {
+    return function (input, total) {
+        total = parseInt(total);
+        for (var i = 0; i < total; i++)
+            input.push(i);
+        return input;
+    };
+});

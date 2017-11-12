@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -21,28 +20,36 @@
 	<div class="container">
 		<h3 id="header">
 			伪艺术家纽约行
-			<button class="btn btn-primary btn-sm" style="float: right"
+			<button class="btn btn-primary" style="float: right"
 				data-toggle="modal" data-target="#ruleModal">
 				<span class="glyphicon glyphicon-question-sign"></span>游戏规则
 			</button>
-			<button class="btn btn-primary btn-sm" style="float: right"
+			<button class="btn btn-primary" style="float: right"
 				data-toggle="modal" data-target="#createGameModal">
 				<span class="glyphicon glyphicon-repeat"></span>开始新游戏
 			</button>
 		</h3>
 		<hr>
+    <div>
 		<div class="btn-group " data-toggle="buttons">
 			<label class="btn btn-default"
 			       ng-repeat="color in colors"
 			       ng-class="{active: color===currentColor}"
 			       ng-click="setCurrentColor(color)"
 				style="color:{{color}}">
-				<input type="radio" ng-model="newGame.ghostNum" value="{{color}}">
+				<input type="radio">
 				&#x2588;
 			</label>
 		</div>
+        <button class="btn btn-primary" style="float: right"
+				ng-click="undoDraw()">
+				<span class="glyphicon glyphicon-repeat" style="transform: rotateY(180deg)"></span>
+		    </button>
+    </div>
 		<hr>
-    <div id="sketchpaddiv" ng-touchstart="drawStart($event)" ng-touchmove="drawMove($event)" >
+    <div id="sketchpaddiv" ng-touchstart="drawStart($event)" ng-mousedown="drawStart($event)" 
+         ng-touchmove="drawMove($event)" ng-mousemove="drawMove($event)" 
+         ng-mouseleave="drawEnd($event)" ng-mouseup="drawEnd($event)" ng-touchend="drawEnd($event)">
 		<svg id="sketchpad">
       <path ng-repeat="path in paths" d="{{path.d}}" fill="none" stroke="{{path.c}}" stroke-width="2"></path>
 		</svg>
@@ -50,7 +57,7 @@
     <hr>
 		<!-- Modal -->
 		<div class="modal fade" id="createGameModal" tabindex="-1"
-			role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+			role="dialog" aria-hidden="true"
 			data-backdrop="static">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -59,11 +66,11 @@
 							aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<h4 class="modal-title" id="myModalLabel">创建游戏</h4>
+						<h4 class="modal-title">创建游戏</h4>
 					</div>
 					<div class="modal-body">
 						<p>
-							<label for="ghostNum" class="col-md-2 control-label">鬼数量</label>
+							<label for="ghostNum" class="col-md-3 control-label">伪艺术家数量</label>
 						</p>
 						<p>
 						<div class="btn-group " data-toggle="buttons">
@@ -76,7 +83,7 @@
 						</div>
 						</p>
 						<p>
-							<label for="humanNum" class="col-md-2 control-label">人类数量</label>
+							<label for="humanNum" class="col-md-3 control-label">真艺术家数量</label>
 						</p>
 						<p>
 						<div class="btn-group " data-toggle="buttons">
@@ -89,24 +96,11 @@
 							</label>
 						</div>
 						</p>
-						<p>
-							<label for="foolNum" class="col-md-2 control-label">傻瓜数量</label>
-						</p>
-						<p>
-						<div class="btn-group " data-toggle="buttons">
-							<label class="btn btn-default btn-sm"
-								ng-class="{active: {{i+1}}==newGame.foolNum}"
-								ng-repeat="i in [] | range:5" ng-click="setFoolNum(i+1)">
-								<input type="radio" name="foolNum" ng-model="newGame.foolNum"
-								id="{{i+1}}" value="{{i+1}}"> {{i+1}}
-							</label>
-						</div>
-						</p>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default btn-xs"
+						<button type="button" class="btn btn-default btn-sm"
 							data-dismiss="modal">取消</button>
-						<button type="button" class="btn btn-primary btn-xs"
+						<button type="button" class="btn btn-primary btn-sm"
 							ng-click="gameNumSet()">下一步</button>
 					</div>
 				</div>
@@ -114,7 +108,7 @@
 		</div>
 		<!-- Modal -->
 		<div class="modal fade" id="setInfoModal" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true"
+			aria-hidden="true"
 			data-backdrop="static">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -123,29 +117,49 @@
 							aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<h4 class="modal-title" id="myModalLabel">输入信息</h4>
+						<h4 class="modal-title">选择题目</h4>
 					</div>
 					<div class="modal-body">
 						<p>
-							<label>鬼的信息：</label> <input type="text"
-								ng-model="newGame.ghostInfo">
+							<label>题目类型：</label> 
+              <div class="btn-group " data-toggle="buttons">
+                <label class="btn btn-default btn-sm"
+                  ng-class="{active: newGame.randomGame==1}"
+                  ng-click="setRandomGame(1)"> <input type="radio">
+                  随机
+                </label>
+                <label class="btn btn-default btn-sm"
+                  ng-class="{active: newGame.randomGame==0}"
+                  ng-click="setRandomGame(0)"> <input type="radio">
+                  自定义
+                </label>
+              </div>
+						</p>
+            <div ng-show="newGame.randomGame">
+            <p>
+							<label>类&emsp;别：</label> <input type="text"
+								ng-model="newGame.category" disabled>
+              <button class="btn btn-primary btn-sm" style="float: right"
+                ng-click="setRandomGame(1)">
+                <span class="glyphicon glyphicon-repeat"></span>
+              </button>
+						</p>
+            </div>
+            <div ng-show="!newGame.randomGame">
+						<p>
+							<label>类&emsp;别：</label> <input type="text"
+								ng-model="newGame.category">
 						</p>
 						<p>
-							<label>人的信息：</label> <input type="text"
-								ng-model="newGame.humanInfo">
+							<label>提示词：</label> <input type="text"
+								ng-model="newGame.word">
 						</p>
-						<p>
-							<label>傻瓜的信息：</label>
-						</p>
-						<p ng-repeat="i in [] | range:newGame.foolNum">
-							<label>傻瓜{{i+1}}</label> <input type="text"
-								ng-model="newGame.foolInfo[i]">
-						</p>
+            </div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default btn-xs"
+						<button type="button" class="btn btn-default btn-sm"
 							ng-click="back2NumSet()">上一步</button>
-						<button type="button" class="btn btn-primary btn-xs"
+						<button type="button" class="btn btn-primary btn-sm"
 							ng-click="createGame()">创建游戏</button>
 					</div>
 				</div>
@@ -153,11 +167,11 @@
 		</div>
 		<!-- Modal -->
 		<div class="modal fade" id="ruleModal" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
+			aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h4 class="modal-title" id="myModalLabel">游戏规则</h4>
+						<h4 class="modal-title">游戏规则</h4>
 					</div>
 					<div class="modal-body">
 						<div>
@@ -171,153 +185,60 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default btn-xs"
+						<button type="button" class="btn btn-default btn-sm"
 							data-dismiss="modal">我知道了</button>
+					</div>
+				</div>
+			</div>
+		</div>
+    <!-- Modal -->
+		<div class="modal fade" id="showInfo" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">选择玩家颜色</h4>
+					</div>
+					<div class="modal-body">
+            <p>
+							<label for="ghostNum" class="control-label">已选择颜色：</label>
+						</p>
+            <p>
+						<div class="btn-group " data-toggle="buttons">
+              <label class="btn btn-default"
+                ng-repeat="color in pickedColors"
+                style="color:{{color}}" disabled>
+                <input type="radio" >
+                &#x2588;
+              </label>
+            </div>
+            </p>
+            <p>
+							<label for="ghostNum" class="control-label">可选择颜色：</label>
+						</p>
+            <p>
+						<div class="btn-group " data-toggle="buttons">
+              <label class="btn btn-default"
+                ng-repeat="color in availableColors"
+                ng-class="{active: color===pickedColor}"
+                ng-click="pickColor(color)"
+                style="color:{{color}}">
+                <input type="radio">
+                &#x2588;
+              </label>
+            </div>
+            </p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-sm"
+							ng-click="showWord()">我选好了</button>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<script>
-		var app = angular.module('myApp', []);
-		app.controller('gamesCtrl', function($scope, $http, $interval) {
-			$scope.newGame = new Object();
-      if (localStorage.currentColor) {
-        $scope.currentColor=localStorage.currentColor;
-      } else {
-        $scope.currentColor=localStorage.currentColor;
-      }
-      
-      if (localStorage.paths) {
-        $scope.paths=localStorage.paths;
-      } else {
-        $scope.paths=[];
-      }
-      
-      $scope.isDrawing = 0;
-      
-			$scope.colors= ['gray','black','red','maroon','yellow','olive','lime','green','aqua','teal','blue','navy','fuchsia','purple']						    
-
-			$scope.changeNick = function() {
-				if ($scope.newNick == '') {
-					$('#nickEmptyAlert').show();
-				} else {
-					$scope.nick = $scope.newNick;
-					localStorage.nick = $scope.nick;
-					$('#editNickModal').modal('hide');
-				}
-			}
-
-			$scope.gameNumSet = function() {
-				$('#createGameModal').modal('hide');
-				$('#setInfoModal').modal('show');
-			}
-
-			$scope.newGame.foolInfo = new Array();
-			$scope.newGame.foolInfo[0] = '';
-			$scope.newGame.foolInfo[1] = '';
-			$scope.newGame.foolInfo[2] = '';
-			$scope.newGame.foolInfo[3] = '';
-			$scope.newGame.foolInfo[4] = '';
-			if (localStorage.game) {
-				$scope.game = localStorage.game;
-			} else {
-			}
-			if ($scope.game) {
-				$('#createGameModal').modal('show');
-			}
-			if (localStorage.humanNum) {
-				$scope.newGame.humanNum = localStorage.humanNum;
-			} else {
-				$scope.newGame.humanNum = 3;
-				localStorage.humanNum = 3;
-			}
-			if (localStorage.ghostNum) {
-				$scope.newGame.ghostNum = localStorage.ghostNum;
-			} else {
-				$scope.newGame.ghostNum = 3;
-				localStorage.ghostNum = 3;
-			}
-			if (localStorage.foolNum) {
-				$scope.newGame.foolNum = localStorage.foolNum;
-			} else {
-				$scope.newGame.foolNum = 2;
-				localStorage.foolNum = 2;
-			}
-
-				$scope.setHumanNum = function(i) {
-				$scope.newGame.humanNum = i;
-				localStorage.humanNum = i;
-
-			}
-      
-      $scope.setCurrentColor = function(color) {
-				$scope.currentColor = color;
-				localStorage.currentColor = color;
-			}
-      
-			$scope.setGhostNum = function(i) {
-				$scope.newGame.ghostNum = i;
-				localStorage.ghostNum = i;
-			}
-			$scope.setFoolNum = function(i) {
-				$scope.newGame.foolNum = i;
-				localStorage.foolNum = i;
-			}
-			$scope.newGame.foolInfo = [ "", "", "", "", "" ];
-			$scope.newGame.humanInfo = "";
-			$scope.newGame.ghostInfo = "";
-			
-      $scope.drawStart = function(e) {
-        console.log(e);
-        e.preventDefault();
-        if (e.touches) {
-            e = e.touches[0];
-        }
-        var path=new Object();
-        path.d='M' + e.offsetX + ' ' + e.offsetY;
-        path.c=$scope.currentColor;
-        
-        $scope.paths.push(path);
-        
-        $scope.isDrawing = 1;
-        
-        console.log('mouse down'+ e.offsetX + ' ' + e.offsetY);
-      }
-      
-      $scope.drawMove = function(e) {
-        if ($scope.isDrawing!=1) {
-          return;
-        }
-        e.preventDefault();
-        if (e.touches) {
-            e = e.touches[0];
-        }
-        var path=new Object();
-        path.d='M' + e.offsetX + ' ' + e.offsetY;
-        path.c=$scope.currentColor;
-        
-        $scope.paths[$scope.paths.length-1].d += ' L' + e.offsetX + ' ' + e.offsetY;
-        
-        console.log('mouse move'+ e.offsetX + ' ' + e.offsetY);
-      }
-      
-			$http.get("/FakeArtist/list.json").success(function(response) {
-				$scope.randomList = response.randomList;
-			});
-		});
-
-		app.filter('range', function() {
-			return function(input, total) {
-				total = parseInt(total);
-				for ( var i = 0; i < total; i++)
-					input.push(i);
-				return input;
-			};
-		});
-	</script>
-  <!-- <script src="/FakeArtist/js/sketchpad.js"></script> -->
+<script src="/FakeArtist/js/sketchpad.js"></script>
 </body>
 </html>
 
